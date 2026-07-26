@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Department Faculty Ranking</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .department-box {
+            background: white;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .excellent { background-color: #55efc4; }
+        .strong { background-color: #81ecec; }
+        .moderate { background-color: #ffeaa7; }
+        .weak { background-color: #ff7675; }
+    </style>
+</head>
+
+<body>
+
+<h1>Department-wise Faculty Ranking</h1>
+
+{% for dept in department_data %}
+
+<div class="department-box">
+
+    <h2>{{ dept.department }}</h2>
+
+    <p><strong>Department Average Score:</strong> {{ dept.department_avg }}</p>
+    <p><strong>Strength Level:</strong> {{ dept.strength }}</p>
+
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Faculty Name</th>
+            <th>Total Score</th>
+            <th>Category</th>
+        </tr>
+
+        {% for f in dept.faculty_list %}
+        <tr>
+            <td>{{ f.rank }}</td>
+            <td>{{ f.name }}</td>
+            <td>{{ f.total_score }}</td>
+            <td>{{ f.category }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+{% endfor %}
+
+</body>
+</html>

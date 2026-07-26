@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+```
+<title>Activity Management Dashboard</title>
+
+<style>
+
+    body{
+        font-family:Arial,sans-serif;
+        background:#f4f6f9;
+        padding:30px;
+    }
+
+    .container{
+        max-width:1400px;
+        margin:auto;
+    }
+
+    .card{
+        background:white;
+        padding:25px;
+        border-radius:10px;
+        margin-bottom:20px;
+        box-shadow:0px 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h1,h2{
+        color:#0d6efd;
+    }
+
+    input,
+    textarea,
+    select{
+        width:100%;
+        padding:12px;
+        border:1px solid #ddd;
+        border-radius:5px;
+        margin-bottom:15px;
+    }
+
+    button{
+        background:#0d6efd;
+        color:white;
+        border:none;
+        padding:12px 25px;
+        border-radius:5px;
+        cursor:pointer;
+    }
+
+    table{
+        width:100%;
+        border-collapse:collapse;
+    }
+
+    table th,
+    table td{
+        border:1px solid #ddd;
+        padding:10px;
+    }
+
+    table th{
+        background:#0d6efd;
+        color:white;
+    }
+
+    .actions{
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:15px;
+        margin-top:20px;
+    }
+
+    .action-box{
+        background:#f8f9fa;
+        padding:20px;
+        text-align:center;
+        border-radius:8px;
+    }
+
+</style>
+```
+
+</head>
+
+<body>
+
+<div class="container">
+
+```
+<div class="card">
+
+    <h1>Activity Management Dashboard</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="activity_name"
+            placeholder="Activity Name"
+            required
+        >
+
+        <select
+            name="department"
+            required
+        >
+
+            <option value="">
+                Select Department
+            </option>
+
+            {% for dept in departments %}
+
+            <option value="{{ dept.id }}">
+                {{ dept.name }}
+            </option>
+
+            {% endfor %}
+
+        </select>
+
+        <input
+            type="text"
+            name="coordinator"
+            placeholder="Coordinator"
+        >
+
+        <input
+            type="text"
+            name="venue"
+            placeholder="Venue"
+        >
+
+        <input
+            type="date"
+            name="activity_date"
+        >
+
+        <textarea
+            name="description"
+            placeholder="Activity Description"
+        ></textarea>
+
+        <button type="submit">
+            Create Activity
+        </button>
+
+    </form>
+
+</div>
+
+<div class="card">
+
+    <h2>Recent Activities</h2>
+
+    <table>
+
+        <tr>
+            <th>Activity</th>
+            <th>Department</th>
+            <th>Date</th>
+            <th>Status</th>
+        </tr>
+
+        {% for activity in activities %}
+
+        <tr>
+
+            <td>{{ activity.title }}</td>
+
+            <td>{{ activity.department }}</td>
+
+            <td>{{ activity.activity_date }}</td>
+
+            <td>{{ activity.status }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+<div class="card">
+
+    <div class="actions">
+
+        <div class="action-box">Upload Photos</div>
+        <div class="action-box">Upload Attendance</div>
+        <div class="action-box">Upload Brochure</div>
+        <div class="action-box">Upload Notice</div>
+        <div class="action-box">Generate AI Report</div>
+        <div class="action-box">Evidence Repository</div>
+        <div class="action-box">Approval Status</div>
+        <div class="action-box">PDF Export</div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
+</body>
+</html>

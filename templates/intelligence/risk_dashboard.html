@@ -1,0 +1,27 @@
+<h1>Department Risk Dashboard</h1>
+
+<table border="1">
+
+<tr>
+<th>Department</th>
+<th>NBA</th>
+<th>NAAC</th>
+<th>Risk</th>
+<th>Issue</th>
+</tr>
+
+{% for r in risks %}
+
+<tr>
+
+<td>{{ r.department.name }}</td>
+<td>{{ r.nba_score }}</td>
+<td>{{ r.naac_score }}</td>
+<td>{{ r.risk_level }}</td>
+<td>{{ r.issue }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>

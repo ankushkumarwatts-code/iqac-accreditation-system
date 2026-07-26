@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Institutional Brain - Smart AI Report Generator</title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f6f9;
+            margin:0;
+            padding:30px;
+        }
+
+        .container{
+            max-width:1400px;
+            margin:auto;
+        }
+
+        .card{
+            background:white;
+            padding:25px;
+            margin-bottom:20px;
+            border-radius:10px;
+            box-shadow:0px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            text-align:center;
+            color:#0d6efd;
+        }
+
+        h2{
+            color:#0d6efd;
+        }
+
+        input,
+        textarea{
+
+            width:100%;
+            padding:12px;
+            border:1px solid #ddd;
+            border-radius:5px;
+            margin-top:5px;
+            margin-bottom:15px;
+
+        }
+
+        textarea{
+            min-height:120px;
+        }
+
+        button{
+
+            background:#0d6efd;
+            color:white;
+            border:none;
+            padding:12px 25px;
+            border-radius:5px;
+            cursor:pointer;
+            font-size:16px;
+
+        }
+
+        button:hover{
+            background:#0b5ed7;
+        }
+
+        .section{
+            margin-bottom:25px;
+        }
+
+        .report-box{
+
+            background:#f8f9fa;
+            padding:15px;
+            border-radius:5px;
+            white-space:pre-wrap;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Smart AI Report Generator</h1>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <label>Activity Name</label>
+            <input
+                type="text"
+                name="activity_name"
+                required
+            >
+
+            <label>Department</label>
+            <input
+                type="text"
+                name="department"
+            >
+
+            <label>Coordinator</label>
+            <input
+                type="text"
+                name="coordinator"
+            >
+
+            <label>Venue</label>
+            <input
+                type="text"
+                name="venue"
+            >
+
+            <label>Date</label>
+            <input
+                type="text"
+                name="date"
+            >
+
+            <label>Number of Participants</label>
+            <input
+                type="text"
+                name="participants"
+            >
+
+            <label>Activity Description</label>
+
+            <textarea
+                name="description"
+            ></textarea>
+
+            <button type="submit">
+
+                Generate Smart Report
+
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if report %}
+
+    <div class="card">
+
+        <h2>{{ report.title }}</h2>
+
+    </div>
+
+    <div class="card">
+
+        <div class="section">
+
+            <h2>Executive Summary</h2>
+
+            <div class="report-box">
+                {{ report.summary }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Objectives</h2>
+
+            <div class="report-box">
+                {{ report.objectives }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Outcomes</h2>
+
+            <div class="report-box">
+                {{ report.outcomes }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Impact Analysis</h2>
+
+            <div class="report-box">
+                {{ report.impact_analysis }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>NAAC Mapping</h2>
+
+            <div class="report-box">
+                {{ report.naac_mapping }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>NBA Mapping</h2>
+
+            <div class="report-box">
+                {{ report.nba_mapping }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>SDG Mapping</h2>
+
+            <div class="report-box">
+                {{ report.sdg_mapping }}
+            </div>
+
+        </div>
+
+        <div class="section">
+
+            <h2>Recommendations</h2>
+
+            <div class="report-box">
+                {{ report.recommendations }}
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

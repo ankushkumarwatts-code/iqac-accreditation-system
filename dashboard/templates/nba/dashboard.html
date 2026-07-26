@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NBA Dashboard</title>
+</head>
+<body style="font-family: Arial; margin:40px;">
+
+<h1>NBA Program & Department Dashboard</h1>
+
+<h2>Department Level Analysis</h2>
+
+<table border="1" cellpadding="8" cellspacing="0" width="60%">
+    <tr>
+        <th>Department</th>
+        <th>NBA Score</th>
+        <th>Status</th>
+    </tr>
+
+    {% for dept in department_data %}
+    <tr>
+        <td>{{ dept.department }}</td>
+        <td>{{ dept.dept_score }}%</td>
+        <td>{{ dept.dept_status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br><br>
+
+<h2>Program Level Analysis</h2>
+
+{% for program in dashboard_data %}
+    <h3>{{ program.program }} ({{ program.department }})</h3>
+    <p>Overall Score: {{ program.program_score }}% | Status: {{ program.program_status }}</p>
+
+    <table border="1" cellpadding="8" cellspacing="0" width="60%">
+        <tr>
+            <th>PO</th>
+            <th>Attainment %</th>
+            <th>Status</th>
+        </tr>
+
+        {% for po in program.po_data %}
+        <tr>
+            <td>{{ po.code }}</td>
+            <td>{{ po.attainment }}%</td>
+            <td>{{ po.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br><br>
+{% endfor %}
+
+</body>
+</html>

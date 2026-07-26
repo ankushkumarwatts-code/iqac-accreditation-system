@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NAAC Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px;">
+
+<h1>NAAC Module Dashboard</h1>
+
+<!-- YEAR FILTER -->
+<form method="get" style="margin-bottom: 20px;">
+    <label>Select Year:</label>
+    <select name="year">
+        <option value="2024" {% if selected_year == 2024 %}selected{% endif %}>2024</option>
+        <option value="2025" {% if selected_year == 2025 %}selected{% endif %}>2025</option>
+        <option value="2026" {% if selected_year == 2026 %}selected{% endif %}>2026</option>
+    </select>
+    <button type="submit">View</button>
+</form>
+
+<!-- KPI Cards -->
+<div style="display: flex; gap: 20px; margin-bottom: 25px;">
+
+    <div style="flex:1; padding:15px; background-color:#e3f2fd;">
+        <h3>Overall Score</h3>
+        <h2>{{ overall_score }}%</h2>
+    </div>
+
+    <div style="flex:1; padding:15px; background-color:#f3e5f5;">
+        <h3>Predicted Grade</h3>
+        <h2>{{ predicted_grade }}</h2>
+    </div>
+
+    <div style="flex:1; padding:15px; background-color:#e8f5e9;">
+        <h3>Health Index</h3>
+        <h2>{{ health_index }}%</h2>
+        <strong>Status: {{ health_status }}</strong>
+    </div>
+
+    <div style="flex:1; padding:15px; background-color:#ffebee;">
+        <h3>Critical Areas</h3>
+        <h2>{{ critical_count }}</h2>
+    </div>
+
+</div>
+
+<!-- GROWTH -->
+{% if growth_status == "up" %}
+<div style="color: green; font-weight: bold;">↑ Growth: +{{ growth }}%</div>
+{% elif growth_status == "down" %}
+<div style="color: red; font-weight: bold;">↓ Decline: {{ growth }}%</div>
+{% endif %}
+
+<!-- ========================= -->
+<!-- 🔥 NEW DEPARTMENT TABLE -->
+<!-- ========================= -->
+
+<h2 style="margin-top:40px;">Department Analytics (NAAC vs NBA)</h2>
+
+<table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <tr style="background:#ddd;">
+        <th>Department</th>
+        <th>NAAC</th>
+        <th>NBA</th>
+        <th>Combined</th>
+        <th>NAAC Risk</th>
+        <th>NBA Risk</th>
+        <th>Overall</th>
+    </tr>
+
+    {% for d in dept_data %}
+    <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.naac }}</td>
+        <td>{{ d.nba }}</td>
+        <td>{{ d.health }}</td>
+
+        <!-- NAAC -->
+        <td style="
+            {% if d.naac_risk == 'HIGH' %}color:red;
+            {% elif d.naac_risk == 'MEDIUM' %}color:orange;
+            {% else %}color:green;
+            {% endif %}
+        ">
+            {{ d.naac_risk }}
+        </td>
+
+        <!-- NBA -->
+        <td style="
+            {% if d.nba_risk == 'HIGH' %}color:red;
+            {% elif d.nba_risk == 'MEDIUM' %}color:orange;
+            {% else %}color:green;
+            {% endif %}
+        ">
+            {{ d.nba_risk }}
+        </td>
+
+        <!-- OVERALL -->
+        <td style="
+            {% if d.overall == 'HIGH' %}color:red;
+            {% elif d.overall == 'MEDIUM' %}color:orange;
+            {% else %}color:green;
+            {% endif %}
+        ">
+            <strong>{{ d.overall }}</strong>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- ========================= -->
+<!-- 📊 GRAPH SECTION -->
+<!-- ========================= -->
+
+<h2 style="margin-top:40px;">Department Comparison Chart</h2>
+
+<canvas id="deptChart" width="800" height="300"></canvas>
+
+<script>
+
+let labels = [{% for d in dept_data %}"{{ d.name }}",{% endfor %}];
+
+let naacData = [{% for d in dept_data %}{{ d.naac }},{% endfor %}];
+let nbaData = [{% for d in dept_data %}{{ d.nba }},{% endfor %}];
+
+const ctx = document.getElementById('deptChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [
+            {
+                label: 'NAAC Score',
+                data: naacData,
+                backgroundColor: 'blue'
+            },
+            {
+                label: 'NBA Score',
+                data: nbaData,
+                backgroundColor: 'orange'
+            }
+        ]
+    }
+});
+
+</script>
+
+<!-- ========================= -->
+<!-- OLD NAAC TABLE (UNCHANGED) -->
+<!-- ========================= -->
+
+<h2 style="margin-top:40px;">Criteria Breakdown</h2>
+
+<table border="1" cellpadding="10" cellspacing="0" width="100%">
+    <tr style="background-color: #f2f2f2;">
+        <th>Criteria</th>
+        <th>Name</th>
+        <th>Percentage</th>
+        <th>Status</th>
+    </tr>
+
+    {% for c in criteria_data %}
+    <tr
+        {% if c.status == "Green" %}
+            style="background-color: #d4edda;"
+        {% elif c.status == "Yellow" %}
+            style="background-color: #fff3cd;"
+        {% else %}
+            style="background-color: #f8d7da;"
+        {% endif %}
+    >
+        <td>{{ c.code }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.percentage }}%</td>
+        <td><strong>{{ c.status }}</strong></td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

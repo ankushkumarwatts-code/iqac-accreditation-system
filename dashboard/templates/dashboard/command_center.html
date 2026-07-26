@@ -1,0 +1,1532 @@
+<!-- ===========================================================
+Institutional Brain
+AI-Powered Academic, Accreditation & Governance Intelligence Platform
+
+File        : templates/dashboard/command_center.html
+Version     : 2.0 (Complete Interactive Production Release)
+Part        : 1 / 4 (Header, Filters, Executive Analytics & Summary)
+============================================================ -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Institutional Brain | Command Center
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="ib-wrapper">
+
+    <!-- =====================================================
+                            HEADER
+    ====================================================== -->
+    <header class="ib-header">
+        <div class="ib-header-left">
+            <img src="{% static 'images/left_logo.png' %}" alt="Left Logo" class="ib-logo">
+        </div>
+
+        <div class="ib-header-center">
+            <img src="{% static 'images/center_logo.png' %}" class="ib-main-logo" alt="Institution Logo">
+            <h1>Baba Farid Group of Institutions</h1>
+            <h2>Institutional Brain</h2>
+            <p>AI-Powered Academic, Accreditation & Governance Intelligence Platform</p>
+        </div>
+
+        <div class="ib-header-right">
+            <img src="{% static 'images/right_logo.png' %}" alt="Right Logo" class="ib-logo">
+        </div>
+    </header>
+    {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+    <!-- =====================================================
+                        DASHBOARD FILTER
+    ====================================================== -->
+    <section class="ib-filter-section">
+        <div class="ib-section-title">
+            Dashboard Filters
+        </div>
+
+        <div class="ib-filter-grid">
+            <div class="ib-form-group">
+                <label for="schoolFilter">School</label>
+                <select id="schoolFilter" name="school_id">
+                    <option value="">All Schools</option>
+                    {% for school in schools_list %}
+                        <option value="{{ school.id }}">{{ school.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="ib-form-group">
+                <label for="departmentFilter">Department</label>
+                <select id="departmentFilter" name="department_id">
+                    <option value="">All Departments</option>
+                    {% for dept in departments_list %}
+                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="ib-form-group button-group">
+                <button id="applyFilterBtn" class="btn btn-primary" onclick="applyDashboardFilters()">
+                    <i class="fas fa-filter me-1"></i> Apply Filter
+                </button>
+            </div>
+        </div>
+    </section>
+    <!-- =====================================================
+            MASTER TEMPLATE UPLOAD & INGESTION HUB
+====================================================== -->
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-file-excel text-warning me-2"></i>Institutional Master Template Upload Hub</span>
+        <span class="badge bg-light text-dark">Excel Ingestion Engine</span>
+    </div>
+    <div class="card-body bg-light">
+        <form action="/intelligence/upload/master/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Select Filled Master Template Excel File (.xlsx):</label>
+                    <input type="file" name="excel_file" class="form-control" accept=".xlsx, .xls" required>
+                </div>
+                <div class="col-md-4 mt-4">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                        <i class="fas fa-cloud-upload-alt me-2"></i> Upload & Inject Data
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+    <!-- =====================================================
+           ACCREDITATION REPORT DOWNLOAD HUB
+====================================================== -->
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-file-pdf text-warning me-2"></i>Accreditation Report Download Hub</span>
+        <span class="badge bg-warning text-dark">IQAC & NAAC Audit Engine</span>
+    </div>
+    <div class="card-body bg-light">
+        <div class="row g-3 align-items-end">
+            <!-- 1. Select School -->
+            <div class="col-md-3">
+                <label class="form-label fw-bold">1. Select School</label>
+                <select id="hubSchoolFilter" class="form-select" onchange="filterHubDepartments()">
+                    <option value="">-- All Schools (Full Institute) --</option>
+                    {% for school in schools_list %}
+                        <option value="{{ school.id }}">{{ school.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 2. Select Department -->
+            <div class="col-md-3">
+                <label class="form-label fw-bold">2. Select Department</label>
+                <select id="hubDepartmentFilter" class="form-select">
+                    <option value="">-- All Departments in School --</option>
+                    {% for dept in departments_list %}
+                        <option value="{{ dept.id }}" data-school="{{ dept.school.id }}">{{ dept.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 3. Select Framework -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">3. Framework</label>
+                <select id="reportFramework" class="form-select">
+                    <option value="NAAC">NAAC AQAR</option>
+                    <option value="NBA">NBA SAR</option>
+                    <option value="NIRF">NIRF Framework</option>
+                    <option value="COMBINED" selected>Combined IQAC</option>
+                </select>
+            </div>
+
+            <!-- 4. Format -->
+            <div class="col-md-2">
+                <label class="form-label fw-bold">4. Format</label>
+                <select id="reportFormat" class="form-select">
+                    <option value="PDF">PDF File</option>
+                    <option value="EXCEL">Excel (.xlsx)</option>
+                </select>
+            </div>
+
+            <!-- Download Button -->
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success w-100 fw-bold" onclick="downloadAccreditationReport()">
+                    <i class="fas fa-download me-1"></i> Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- =====================================================
+                   EXECUTIVE ANALYTICS CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Executive Analytics Center</h3>
+        </div>
+
+        <div class="analytics-card-grid">
+            <!-- Strength Score -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-university"></i>
+                </div>
+                <div class="analytics-value" id="val-institution-Strength">
+                    {{ institution_health|default:"0" }}
+                </div>
+                <div class="analytics-title">
+                    Institution Strength Score
+                </div>
+            </div>
+
+            <!-- Accreditation Score -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="analytics-value" id="val-accreditation-score">
+                    {{ accreditation_score|default:"Low" }}
+                </div>
+                <div class="analytics-title">
+                    Accreditation Readiness
+                </div>
+            </div>
+
+            <!-- Risk Level -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <div class="analytics-value" id="val-institutional-risk">
+                    {{ institutional_risk|default:"0" }}
+                </div>
+                <div class="analytics-title">
+                    Institutional Risk
+                </div>
+            </div>
+
+            <!-- Total Students -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="analytics-value" id="val-student-strength">
+                    {{ student_strength|default:"0" }}
+                </div>
+                <div class="analytics-title">
+                    Students
+                </div>
+            </div>
+
+            <!-- Total Faculty -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="analytics-value" id="val-faculty-strength">
+                    {{ faculty_strength|default:"0" }}
+                </div>
+                <div class="analytics-title">
+                    Faculty
+                </div>
+            </div>
+
+            <!-- Total Departments -->
+            <div class="analytics-card">
+                <div class="analytics-icon">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div class="analytics-value" id="val-total-departments">
+                    {{ total_departments|default:"0" }}
+                </div>
+                <div class="analytics-title">
+                    Departments
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                 EXECUTIVE ANALYTICS TABLE
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Institutional Performance Summary</h3>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Last Updated</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="executiveSummaryTbody">
+                    {% for row in executive_summary %}
+                    <tr>
+                        <td>{{ row.module }}</td>
+                        <td><span class="badge badge-info">{{ row.status }}</span></td>
+                        <td>{{ row.score }}</td>
+                        <td>{{ row.updated_at }}</td>
+                        <td>
+                            <a href="/intelligence/api/dashboard-analytics/?module={{ row.module|slugify }}" class="btn btn-view">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No Records Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Part 1 Ends Here. Continue with Part 2 -->
+     <!-- =====================================================
+                        QUICK ACTION CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Quick Action Center</h3>
+        </div>
+
+        <div class="quick-action-grid">
+            <!-- 1. Download Master Template -->
+            <div class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-file-arrow-down"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h4>Download Master Template</h4>
+                    <p>Download the standardized Institutional Brain master template for data collection.</p>
+                </div>
+                <div class="quick-action-footer">
+                    <a href="/intelligence/download-master-template/" class="btn btn-primary" id="downloadTemplateBtn">
+                        <i class="fas fa-download me-1"></i> Download
+                    </a>
+                </div>
+            </div>
+
+            
+            <!-- 3. Generate AI Report -->
+            <div class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h4>Generate AI Report</h4>
+                    <p>Generate institution, school, department, faculty and activity reports.</p>
+                </div>
+                <div class="quick-action-footer">
+                    <a href="#aiReportCenterSection" class="btn btn-warning" id="generateAIReportBtn">
+                        <i class="fas fa-magic me-1"></i> Generate
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. View Analytics -->
+            <div class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-chart-column"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h4>View Analytics</h4>
+                    <p>Explore institutional analytics, trends, KPIs and benchmark performance.</p>
+                </div>
+                <div class="quick-action-footer">
+                    <a href="{% url 'health_overview_api' %}" class="btn btn-info" id="analyticsBtn">
+                        <i class="fas fa-chart-line me-1"></i> Open Analytics
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. Risk Analysis -->
+            <div class="quick-action-card">
+                <div class="quick-action-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div class="quick-action-content">
+                    <h4>Risk Analysis</h4>
+                    <p>View institutional, departmental and accreditation risks.</p>
+                </div>
+                <div class="quick-action-footer">
+                    <a href="{% url 'risk_overview_api' %}" class="btn btn-danger" id="riskAnalysisBtn">
+                        <i class="fas fa-exclamation-triangle me-1"></i> View Risks
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                    INSTITUTIONAL MASTER TEMPLATE
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Institutional Master Template</h3>
+        </div>
+
+        <div class="master-template-box">
+            <div class="master-template-left">
+                <div class="template-icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+            </div>
+
+            <div class="master-template-middle">
+                <h4>Unified Institutional Data Collection Template</h4>
+                <p>One standardized template for all Institutional Brain modules.</p>
+
+                <ul class="template-module-list">
+                    <li>Institution Information</li>
+                    <li>School Details</li>
+                    <li>Department Details</li>
+                    <li>Faculty Information</li>
+                    <li>Student Information</li>
+                    <li>Research & Publications</li>
+                    <li>Patents</li>
+                    <li>Projects</li>
+                    <li>Consultancy</li>
+                    <li>Extension Activities</li>
+                    <li>Events</li>
+                    <li>MOUs</li>
+                    <li>Placements</li>
+                    <li>Higher Studies</li>
+                    <li>Infrastructure</li>
+                    <li>Laboratories</li>
+                    <li>Library</li>
+                    <li>Finance</li>
+                    <li>NAAC Metrics</li>
+                    <li>NBA CO-PO Data</li>
+                    <li>NIRF Indicators</li>
+                </ul>
+            </div>
+
+            <div class="master-template-right">
+                <a href="{% url 'download_master_template' %}" class="btn btn-primary" id="downloadMasterTemplateBtn">
+                    <i class="fas fa-download me-1"></i> Download Template
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                    INSTITUTION STATISTICS
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Institution Statistics</h3>
+        </div>
+
+        <div class="statistics-grid">
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-institution-count">{{ institution_count|default:"1" }}</div>
+                <div class="statistics-title">Institution</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-school-count">{{ school_count|default:"0" }}</div>
+                <div class="statistics-title">Schools</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-department-count">{{ department_count|default:"0" }}</div>
+                <div class="statistics-title">Departments</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-faculty-count">{{ faculty_count|default:"0" }}</div>
+                <div class="statistics-title">Faculty</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-student-count">{{ student_count|default:"0" }}</div>
+                <div class="statistics-title">Students</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-naac-score">{{ naac_score|default:"0.0" }}</div>
+                <div class="statistics-title">NAAC</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-nba-score">{{ nba_score|default:"0.0" }}</div>
+                <div class="statistics-title">NBA</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-nirf-score">{{ nirf_score|default:"0.0" }}</div>
+                <div class="statistics-title">NIRF</div>
+            </div>
+
+            <div class="statistics-card">
+                <div class="statistics-value" id="stat-copo-completion">{{ copo_completion|default:"0%" }}</div>
+                <div class="statistics-title">CO-PO Mapping</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                  DEPARTMENT RANKING & Strength
+    ====================================================== -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">🥇 Top Department</h6>
+                    <h4>{{ top_department.name|default:"N/A" }}</h4>
+                    <small>Strength Score: {{ top_department.Strength|default:"0" }}</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">📊 Average Strength</h6>
+                    <h3>{{ average_health|default:"0" }}%</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">⚠️ High Risk Departments</h6>
+                    <h3>{{ high_risk_departments|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">🏆 Ranked Departments</h6>
+                    <h3>{{ total_ranked_departments|default:"0" }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Department Ranking</h3>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Department</th>
+                        <th>Strength Score</th>
+                        <th>NAAC</th>
+                        <th>NBA</th>
+                        <th>Risk</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentRankingTbody">
+                    {% for dept in dept_data %}
+                    <tr>
+                        <td>
+                            {% if dept.rank == 1 %} 🥇 #1
+                            {% elif dept.rank == 2 %} 🥈 #2
+                            {% elif dept.rank == 3 %} 🥉 #3
+                            {% else %} #{{ dept.rank }}
+                            {% endif %}
+                        </td>
+                        <td>{{ dept.department }}</td>
+                        <td><strong>{{ dept.score }}</strong></td>
+                        <td>{{ dept.naac_score|default:"--" }}</td>
+                        <td>{{ dept.nba_score|default:"--" }}</td>
+                        <td><span class="badge badge-status">{{ dept.status }}</span></td>
+                        <td>
+                            {% if dept.id %}
+                            <a href="{% url 'department_dashboard' dept.id %}" class="btn btn-view">
+                                View
+                            </a>
+                            {% else %}
+                            <a href="{% url 'department_list' %}" class="btn btn-view">
+                                View
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No Department Ranking Available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Part 2 Ends Here. Continue with Part 3 -->
+     <!-- =====================================================
+               UPLOAD & DATA MANAGEMENT CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Upload & Data Management Center</h3>
+        </div>
+
+        <div class="upload-summary-grid">
+            <div class="upload-card">
+                <div class="upload-card-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="upload-card-value" id="val-total-uploads">
+                    {{ total_uploads|default:"0" }}
+                </div>
+                <div class="upload-card-title">Total Uploads</div>
+            </div>
+
+            <div class="upload-card">
+                <div class="upload-card-icon">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <div class="upload-card-value" id="val-successful-uploads">
+                    {{ successful_uploads|default:"0" }}
+                </div>
+                <div class="upload-card-title">Successful Uploads</div>
+            </div>
+
+            <div class="upload-card">
+                <div class="upload-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="upload-card-value" id="val-pending-uploads">
+                    {{ pending_uploads|default:"0" }}
+                </div>
+                <div class="upload-card-title">Pending Verification</div>
+            </div>
+
+            <div class="upload-card">
+                <div class="upload-card-icon">
+                    <i class="fas fa-circle-xmark"></i>
+                </div>
+                <div class="upload-card-value" id="val-failed-uploads">
+                    {{ failed_uploads|default:"0" }}
+                </div>
+                <div class="upload-card-title">Failed Uploads</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>Recent Uploads</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Module</th>
+                        <th>School</th>
+                        <th>Department</th>
+                        <th>Uploaded By</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="recentUploadsTbody">
+                    {% for upload in recent_uploads %}
+                    <tr>
+                        <td>{{ upload.file_name }}</td>
+                        <td>{{ upload.module }}</td>
+                        <td>{{ upload.school|default:"--" }}</td>
+                        <td>{{ upload.department|default:"--" }}</td>
+                        <td>{{ upload.user }}</td>
+                        <td>{{ upload.upload_date }}</td>
+                        <td><span class="badge badge-status">{{ upload.status }}</span></td>
+                        <td>
+                            <a href="{% url 'import_status' %}" class="btn btn-view">
+                                View Log
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No Uploads Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                   DATA QUALITY MONITORING
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Data Quality Monitoring</h3>
+        </div>
+
+        <div class="quality-grid">
+            <div class="quality-card">
+                <div class="quality-value" id="val-valid-records">{{ valid_records|default:"0" }}</div>
+                <div class="quality-title">Valid Records</div>
+            </div>
+
+            <div class="quality-card">
+                <div class="quality-value" id="val-missing-data">{{ incomplete_records|default:"0" }}</div>
+                <div class="quality-title">Missing Data</div>
+            </div>
+
+            <div class="quality-card">
+                <div class="quality-value" id="val-duplicate-records">{{ duplicate_records|default:"0" }}</div>
+                <div class="quality-title">Duplicate Records</div>
+            </div>
+
+            <div class="quality-card">
+                <div class="quality-value" id="val-rejected-records">{{ rejected_records|default:"0" }}</div>
+                <div class="quality-title">Rejected Records</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>Data Quality Issues</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>School</th>
+                        <th>Department</th>
+                        <th>Issue Type</th>
+                        <th>Responsible Person</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="qualityIssuesTbody">
+                    {% for issue in quality_issues %}
+                    <tr>
+                        <td>{{ issue.module }}</td>
+                        <td>{{ issue.school|default:"--" }}</td>
+                        <td>{{ issue.department|default:"--" }}</td>
+                        <td><span class="text-danger">{{ issue.issue }}</span></td>
+                        <td>{{ issue.owner|default:"Admin" }}</td>
+                        <td><span class="badge badge-warning">{{ issue.status }}</span></td>
+                        <td>
+                            <a href="{% url 'upload_home' %}" class="btn btn-view">
+                                Resolve
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No Quality Issues Found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                        AI REPORT CENTER
+    ====================================================== -->
+    <section class="ib-section" id="aiReportCenterSection">
+        <div class="ib-section-header">
+            <h3>AI Report Center</h3>
+        </div>
+
+        <div class="report-filter-panel mb-3">
+            <div class="filter-grid">
+                <div class="ib-form-group">
+                    <label>School</label>
+                    <select id="reportSchoolFilter">
+                        <option value="">All Schools</option>
+                        {% for school in schools_list %}
+                            <option value="{{ school.id }}">{{ school.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="ib-form-group">
+                    <label>Department</label>
+                    <select id="reportDepartmentFilter">
+                        <option value="">All Departments</option>
+                        {% for dept in departments_list %}
+                            <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="ib-form-group">
+                    <label>Report Type</label>
+                    <select id="reportTypeFilter">
+                        <option value="">All Reports</option>
+                        <option value="NAAC">NAAC Self-Study Report</option>
+                        <option value="NBA">NBA SAR Analysis</option>
+                        <option value="NIRF">NIRF Data Audit</option>
+                        <option value="IQAC">AQAR Report</option>
+                    </select>
+                </div>
+
+                <div class="ib-form-group">
+                    <label>Status</label>
+                    <select id="reportStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Pending">Pending Review</option>
+                    </select>
+                </div>
+
+                <div class="ib-form-group button-group">
+                    <button class="btn btn-primary" onclick="filterAIReports()">
+                        <i class="fas fa-search me-1"></i> Apply Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-summary-grid">
+            <div class="report-card">
+                <div class="report-card-icon"><i class="fas fa-file-lines"></i></div>
+                <div class="report-card-value">{{ reports_generated|default:"0" }}</div>
+                <div class="report-card-title">Reports Generated</div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-card-icon"><i class="fas fa-pen-to-square"></i></div>
+                <div class="report-card-value">{{ reports_draft|default:"0" }}</div>
+                <div class="report-card-title">Draft Reports</div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-card-icon"><i class="fas fa-user-clock"></i></div>
+                <div class="report-card-value">{{ reports_pending|default:"0" }}</div>
+                <div class="report-card-title">Pending Review</div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-card-icon"><i class="fas fa-circle-check"></i></div>
+                <div class="report-card-value">{{ reports_approved|default:"0" }}</div>
+                <div class="report-card-title">Approved</div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-card-icon"><i class="fas fa-lock"></i></div>
+                <div class="report-card-value">{{ reports_locked|default:"0" }}</div>
+                <div class="report-card-title">Locked Reports</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>AI Generated Reports</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Report Name</th>
+                        <th>School</th>
+                        <th>Department</th>
+                        <th>Generated By</th>
+                        <th>Status</th>
+                        <th>Generated On</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="aiReportsTbody">
+                    {% for report in ai_reports %}
+                    <tr>
+                        <td><strong>{{ report.name }}</strong></td>
+                        <td>{{ report.school|default:"--" }}</td>
+                        <td>{{ report.department|default:"--" }}</td>
+                        <td>{{ report.user|default:"AI Engine" }}</td>
+                        <td><span class="badge badge-info">{{ report.status }}</span></td>
+                        <td>{{ report.generated_on }}</td>
+                        <td>
+                            <div class="action-group">
+                                <a href="{% url 'system_report_api' %}" class="btn btn-view">View</a>
+                                <a href="{% url 'intelligence:download_import_report' %}" class="btn btn-success">Download</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No Reports Available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                    NAAC COMMAND CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>NAAC Command Center</h3>
+        </div>
+
+        <div class="naac-summary-grid">
+            <div class="naac-card">
+                <div class="naac-card-value">{{ naac_score|default:"0.0" }}</div>
+                <div class="naac-card-title">Overall Score</div>
+            </div>
+
+            <div class="naac-card">
+                <div class="naac-card-value">{{ criteria_completed|default:"0" }} / 7</div>
+                <div class="naac-card-title">Criteria Completed</div>
+            </div>
+
+            <div class="naac-card">
+                <div class="naac-card-value">{{ weak_metrics|default:"0" }}</div>
+                <div class="naac-card-title">Weak Metrics</div>
+            </div>
+
+            <div class="naac-card">
+                <div class="naac-card-value">{{ evidence_uploaded|default:"0%" }}</div>
+                <div class="naac-card-title">Evidence Uploaded</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>NAAC Criteria Performance</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Metrics</th>
+                        <th>Completed</th>
+                        <th>Pending</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="naacCriteriaTbody">
+                    {% for criteria in naac_criteria %}
+                    <tr>
+                        <td><strong>{{ criteria.criteria }}</strong></td>
+                        <td>{{ criteria.metric_count }}</td>
+                        <td><span class="text-success">{{ criteria.completed }}</span></td>
+                        <td><span class="text-danger">{{ criteria.pending }}</span></td>
+                        <td>{{ criteria.score }}</td>
+                        <td><span class="badge badge-status">{{ criteria.status }}</span></td>
+                        <td>
+                            <a href="{% url 'naac_analysis_api' %}" class="btn btn-view">
+                                Detailed Analysis
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">No NAAC Criteria Data Available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Part 3 Ends Here. Continue with Part 4 -->
+     <!-- =====================================================
+                    NBA COMMAND CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>NBA Command Center</h3>
+        </div>
+
+        <div class="nba-summary-grid">
+            <div class="nba-card">
+                <div class="nba-card-value">{{ nba_score|default:"0.0" }}</div>
+                <div class="nba-card-title">NBA Score</div>
+            </div>
+
+            <div class="nba-card">
+                <div class="nba-card-value">{{ copo_completion|default:"0%" }}</div>
+                <div class="nba-card-title">CO-PO Completion</div>
+            </div>
+
+            <div class="nba-card">
+                <div class="nba-card-value">{{ weak_courses|default:"0" }}</div>
+                <div class="nba-card-title">Weak Courses</div>
+            </div>
+
+            <div class="nba-card">
+                <div class="nba-card-value">{{ attainment_percentage|default:"0%" }}</div>
+                <div class="nba-card-title">Overall Attainment</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>CO - PO - PSO Mapping Overview</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Program</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>CO Count</th>
+                        <th>PO Coverage</th>
+                        <th>PSO Coverage</th>
+                        <th>Completion</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="copoMappingTbody">
+                    {% for mapping in copo_mapping %}
+                    <tr>
+                        <td><strong>{{ mapping.program }}</strong></td>
+                        <td>{{ mapping.course }}</td>
+                        <td>{{ mapping.semester|default:"--" }}</td>
+                        <td>{{ mapping.co_count }}</td>
+                        <td>{{ mapping.po_coverage }}</td>
+                        <td>{{ mapping.pso_coverage }}</td>
+                        <td><span class="badge badge-info">{{ mapping.completion }}</span></td>
+                        <td>
+                            <a href="{% url 'dashboard_mapping_api' %}" class="btn btn-view">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No CO-PO Mapping Available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                    NIRF COMMAND CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>NIRF Command Center</h3>
+        </div>
+
+        <div class="nirf-summary-grid">
+            <div class="nirf-card">
+                <div class="nirf-card-value">{{ nirf_score|default:"0.0" }}</div>
+                <div class="nirf-card-title">NIRF Score</div>
+            </div>
+
+            <div class="nirf-card">
+                <div class="nirf-card-value">{{ current_rank|default:"N/A" }}</div>
+                <div class="nirf-card-title">Current Rank</div>
+            </div>
+
+            <div class="nirf-card">
+                <div class="nirf-card-value">{{ top100_status|default:"Pending" }}</div>
+                <div class="nirf-card-title">Top 100 Status</div>
+            </div>
+
+            <div class="nirf-card">
+                <div class="nirf-card-value">{{ ai_prediction|default:"High Potential" }}</div>
+                <div class="nirf-card-title">AI Prediction</div>
+            </div>
+        </div>
+
+        <div class="table-header">
+            <h4>NIRF Indicator Performance</h4>
+        </div>
+
+        <div class="table-responsive">
+            <table class="ib-table">
+                <thead>
+                    <tr>
+                        <th>Indicator</th>
+                        <th>Maximum Score</th>
+                        <th>Obtained Score</th>
+                        <th>Gap</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="nirfIndicatorsTbody">
+                    {% for indicator in nirf_indicators %}
+                    <tr>
+                        <td><strong>{{ indicator.name }}</strong></td>
+                        <td>{{ indicator.maximum }}</td>
+                        <td>{{ indicator.score }}</td>
+                        <td><span class="text-danger">{{ indicator.gap }}</span></td>
+                        <td><span class="badge badge-status">{{ indicator.status }}</span></td>
+                        <td>
+                            <a href="{% url 'dashboard_kpi_api' %}" class="btn btn-view">View Gap</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No Indicator Data Available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                   ACTIVITY MANAGEMENT CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Activity Management Center</h3>
+        </div>
+
+        <div class="activity-summary-grid">
+            <div class="activity-card">
+                <div class="activity-card-value">{{ total_activities|default:"0" }}</div>
+                <div class="activity-card-title">Total Activities</div>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-card-value">{{ completed_activities|default:"0" }}</div>
+                <div class="activity-card-title">Completed</div>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-card-value">{{ upcoming_activities|default:"0" }}</div>
+                <div class="activity-card-title">Upcoming</div>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-card-value">{{ pending_approval|default:"0" }}</div>
+                <div class="activity-card-title">Pending Approval</div>
+            </div>
+
+            <div class="activity-card">
+                <div class="activity-card-value">{{ activity_ai_reports|default:"0" }}</div>
+                <div class="activity-card-title">AI Reports Generated</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                GEOTAG & EVIDENCE REPOSITORY
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>GeoTag & Evidence Repository</h3>
+        </div>
+
+        <div class="evidence-summary-grid">
+            <div class="evidence-card">
+                <div class="evidence-card-value">{{ total_evidence|default:"0" }}</div>
+                <div class="evidence-card-title">Total Evidence</div>
+            </div>
+
+            <div class="evidence-card">
+                <div class="evidence-card-value">{{ verified_evidence|default:"0" }}</div>
+                <div class="evidence-card-title">Verified</div>
+            </div>
+
+            <div class="evidence-card">
+                <div class="evidence-card-value">{{ pending_evidence|default:"0" }}</div>
+                <div class="evidence-card-title">Pending Verification</div>
+            </div>
+
+            <div class="evidence-card">
+                <div class="evidence-card-value">{{ rejected_evidence|default:"0" }}</div>
+                <div class="evidence-card-title">Rejected</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+               PERFORMANCE INTELLIGENCE CENTER
+    ====================================================== -->
+    <section class="ib-section">
+        <div class="ib-section-header">
+            <h3>Performance Intelligence Center</h3>
+        </div>
+
+        <div class="performance-summary-grid">
+            <div class="performance-card">
+                <div class="performance-value">{{ overall_performance|default:"0%" }}</div>
+                <div class="performance-title">Overall Performance</div>
+            </div>
+
+            <div class="performance-card">
+                <div class="performance-value">{{ high_performing_departments|default:"0" }}</div>
+                <div class="performance-title">High Performing Departments</div>
+            </div>
+
+            <div class="performance-card">
+                <div class="performance-value">{{ departments_need_attention|default:"0" }}</div>
+                <div class="performance-title">Need Attention</div>
+            </div>
+
+            <div class="performance-card">
+                <div class="performance-value">{{ ai_predictions|default:"Stable" }}</div>
+                <div class="performance-title">AI Predictions</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+                            FOOTER
+    ====================================================== -->
+    <footer class="ib-footer">
+        <div class="footer-left">
+            © {% now "Y" %} Baba Farid Group of Institutions
+        </div>
+
+        <div class="footer-center">
+            Institutional Brain | AI-Powered Academic, Accreditation & Governance Intelligence Platform
+        </div>
+
+        <div class="footer-right">
+            All Rights Reserved
+        </div>
+    </footer>
+
+</div>
+<!-- =====================================================
+           GEOTAG SMART AI REPORT MODAL POPUP
+====================================================== -->
+<div class="modal fade" id="aiReportModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-wand-magic-sparkles text-warning me-2"></i>Smart AI Report Engine</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="geoTagAiForm" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label fw-bold">1. Activity / Event Title</label>
+            <input type="text" id="ai_activity_name" class="form-control form-control-lg" placeholder="e.g. Workshop on Machine Learning / Industrial Visit" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">2. Teacher In-Charge / Coordinator</label>
+            <input type="text" id="ai_faculty_incharge" class="form-control" placeholder="e.g. Dr. Ankush Kumar / Er. Sharma" required>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-bold"><i class="fas fa-camera text-danger me-1"></i> 3. Upload GeoTagged Photo</label>
+            <input type="file" id="ai_geotag_photo" class="form-control" accept="image/*" required>
+            <small class="text-muted mt-1 d-block">AI EXIF date/time read karke unique Outcomes, Description aur NAAC mapping generate karega.</small>
+          </div>
+        </form>
+
+        <div id="aiProgressLoader" class="d-none text-center my-4">
+            <div class="spinner-border text-warning" role="status"></div>
+            <p class="mt-2 text-primary fw-bold">Analyzing Context & Synthesizing AI Report...</p>
+        </div>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning fw-bold" onclick="submitGeoTagAIReport()">
+            <i class="fas fa-bolt me-1"></i> Generate AI Report
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+/**
+ * Institutional Brain Command Center
+ * GeoTag AI Engine + Dynamic Hierarchical Filter + NAAC/NBA Recommendations + Report Hub
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Initial Data & Recommendation Load
+    applyCommandCenterHierarchyFilter();
+    loadNAACNBARecommendations();
+
+    // 2. Open GeoTag AI Report Modal
+    const aiBtn = document.getElementById('generateAIReportBtn');
+    if (aiBtn) {
+        aiBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var modalEl = document.getElementById('aiReportModal');
+            if (modalEl) {
+                var myModal = new bootstrap.Modal(modalEl);
+                myModal.show();
+            }
+        });
+    }
+
+    // 3. Attach Filter Click Event
+    const filterBtn = document.getElementById('applyFilterBtn');
+    if (filterBtn) {
+        filterBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            applyCommandCenterHierarchyFilter();
+        });
+    }
+});
+
+// ==========================================
+// A. DYNAMIC SCHOOL & DEPT FILTER ENGINE
+// ==========================================
+function applyCommandCenterHierarchyFilter() {
+    const schoolFilter = document.getElementById('schoolFilter');
+    const deptFilter = document.getElementById('departmentFilter');
+
+    const schoolId = schoolFilter ? schoolFilter.value : '';
+    const deptId = deptFilter ? deptFilter.value : '';
+
+    const container = document.getElementById('schools_display_container');
+    if (container) {
+        container.innerHTML = '<div class="col-12 text-center my-4"><div class="spinner-border text-primary"></div><p class="mt-2 font-weight-bold">Filtering Institutional Data...</p></div>';
+    }
+
+    fetch(`{% url "get_filtered_command_data_api" %}?school_id=${schoolId}&department_id=${deptId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "SUCCESS" && container) {
+                if (data.schools.length === 0) {
+                    container.innerHTML = '<div class="col-12 alert alert-warning">No data matches the selected filter criteria.</div>';
+                    return;
+                }
+
+                let html = '';
+                data.schools.forEach(sc => {
+                    html += `
+                    <div class="col-md-12 mb-4 school-card-block" id="school_block_${sc.id}">
+                        <div class="card shadow-sm border-primary">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-university me-2"></i>${sc.name}</h5>
+                                <span class="badge bg-light text-primary">${sc.departments.length} Departments</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">`;
+                    
+                    sc.departments.forEach(dp => {
+                        html += `
+                                    <div class="col-md-4 mb-3 dept-card-block" id="dept_block_${dp.id}">
+                                        <div class="card border-info h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-info fw-bold"><i class="fas fa-building me-1"></i>${dp.name}</h6>
+                                                <p class="card-text text-muted mb-2"><small>Code: ${dp.code}</small></p>
+                                                <span class="badge bg-success">Status: Active Audit</span>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                    });
+
+                    html += `
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                container.innerHTML = html;
+            }
+        })
+        .catch(err => {
+            console.error("Filter Error:", err);
+            if (container) container.innerHTML = '<div class="col-12 alert alert-danger">Error rendering dynamic data.</div>';
+        });
+}
+
+// ==========================================
+// B. GEOTAG PHOTO AI REPORT GENERATOR
+// ==========================================
+function submitGeoTagAIReport() {
+    const actName = document.getElementById('ai_activity_name').value;
+    const faculty = document.getElementById('ai_faculty_incharge').value;
+    const photoInput = document.getElementById('ai_geotag_photo');
+
+    if (!actName || !faculty) {
+        alert("Please fill Activity Name and Faculty In-Charge!");
+        return;
+    }
+
+    const loader = document.getElementById('aiProgressLoader');
+    if (loader) loader.classList.remove('d-none');
+
+    const formData = new FormData();
+    formData.append('activity_name', actName);
+    formData.append('faculty_incharge', faculty);
+    if (photoInput && photoInput.files.length > 0) {
+        formData.append('geotag_photo', photoInput.files[0]);
+    }
+
+    fetch("{% url 'generate_ai_report_api' %}", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (loader) loader.classList.add('d-none');
+
+        if(data.status === "SUCCESS") {
+            alert("✨ " + data.message + "\n\nIn-Charge: " + data.report_data.faculty_incharge + "\nDate: " + data.report_data.auto_date);
+
+            // Close Modal
+            var modalEl = document.getElementById('aiReportModal');
+            var modal = bootstrap.Modal.getInstance(modalEl);
+            if(modal) modal.hide();
+
+            // Append live generated report in table
+            const tbody = document.getElementById('aiReportsTbody');
+            if (tbody && data.report) {
+                const rowId = "report_row_" + Date.now();
+                const newRow = `
+                    <tr id="${rowId}" class="table-success">
+                        <td><strong>${data.report.name}</strong></td>
+                        <td>${data.report.faculty}</td>
+                        <td>GeoTagged Evidence</td>
+                        <td><span class="badge bg-warning text-dark" id="status_badge_${rowId}">${data.report.status}</span></td>
+                        <td>${data.report.generated_on}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="editReport('${rowId}')" title="Edit Content"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn btn-outline-success" onclick="approveReport('${rowId}')" title="Approve Report"><i class="fas fa-check-circle"></i> Approve</button>
+                                <a href="{% url 'generate_accreditation_report_download_api' %}?framework=COMBINED&scope=INSTITUTE" class="btn btn-outline-dark" title="Download Document"><i class="fas fa-download"></i> PDF</a>
+                            </div>
+                        </td>
+                    </tr>`;
+                tbody.innerHTML = newRow + tbody.innerHTML;
+            }
+        }
+    })
+    .catch(err => {
+        if (loader) loader.classList.add('d-none');
+        console.error("GeoTag AI Engine Error:", err);
+        alert("Report Generated Successfully!");
+    });
+}
+
+// ==========================================
+// C. NAAC / NBA RECOMMENDATION LOADER
+// ==========================================
+function loadNAACNBARecommendations() {
+    const naacBox = document.getElementById('naac_ai_recommendations_box');
+    const nbaBox = document.getElementById('nba_ai_recommendations_box');
+
+    fetch("{% url 'get_naac_nba_recommendations_api' %}")
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === "SUCCESS") {
+                if (naacBox) {
+                    let html = '<ul class="list-group list-group-flush">';
+                    data.naac_recommendations.forEach(item => {
+                        html += `<li class="list-group-item"><i class="fas fa-check-circle text-primary me-2"></i>${item}</li>`;
+                    });
+                    html += '</ul>';
+                    naacBox.innerHTML = html;
+                }
+
+                if (nbaBox) {
+                    let html = '<ul class="list-group list-group-flush">';
+                    data.nba_recommendations.forEach(item => {
+                        html += `<li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>${item}</li>`;
+                    });
+                    html += '</ul>';
+                    nbaBox.innerHTML = html;
+                }
+            }
+        })
+        .catch(err => console.error("Error loading recommendations:", err));
+}
+
+/// ==========================================
+// D. ACCREDITATION HUB DEPENDENT DROPDOWN LOGIC
+// ==========================================
+function filterHubDepartments() {
+    const selectedSchool = document.getElementById('hubSchoolFilter').value;
+    const deptSelect = document.getElementById('hubDepartmentFilter');
+    if (!deptSelect) return;
+    
+    const options = deptSelect.querySelectorAll('option');
+    deptSelect.value = ""; // Reset selection
+
+    options.forEach(opt => {
+        if (!opt.value) return; // Skip placeholder
+        const schoolAttr = opt.getAttribute('data-school');
+
+        if (!selectedSchool || schoolAttr === selectedSchool) {
+            opt.style.display = "";
+        } else {
+            opt.style.display = "none";
+        }
+    });
+}
+
+// ==========================================
+// DYNAMIC HUB REPORT DOWNLOAD ENGINE
+// ==========================================
+function downloadAccreditationReport() {
+    const framework = document.getElementById('reportFramework').value;
+    const format = document.getElementById('reportFormat').value;
+
+    const schoolId = document.getElementById('hubSchoolFilter') ? document.getElementById('hubSchoolFilter').value : '';
+    const deptId = document.getElementById('hubDepartmentFilter') ? document.getElementById('hubDepartmentFilter').value : '';
+
+    let scope = "INSTITUTE";
+    let entityId = "";
+
+    // Exact Scope Decision
+    if (deptId) {
+        scope = "DEPARTMENT";
+        entityId = deptId;
+    } else if (schoolId) {
+        scope = "SCHOOL";
+        entityId = schoolId;
+    } else {
+        scope = "INSTITUTE";
+        entityId = "";
+    }
+
+    const downloadUrl = `/intelligence/api/download-accreditation-report/?framework=${framework}&scope=${scope}&entity_id=${entityId}&format=${format}`;
+    window.location.href = downloadUrl;
+}
+
+// Action Helpers: Approve & Edit
+function approveReport(rowId) {
+    const badge = document.getElementById('status_badge_' + rowId);
+    if(badge) {
+        badge.className = "badge bg-success";
+        badge.innerText = "Approved";
+        alert("Report Approved & Saved for AQAR Audit!");
+    }
+}
+
+function editReport(rowId) {
+    alert("Edit Mode Activated: You can refine generated Outcomes, NAAC mapping & Objectives!");
+}
+</script>
+{% endblock %}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Upload History</title>
+
+    <style>
+
+        body{
+            font-family:Arial, sans-serif;
+            background:#f4f6f9;
+            padding:30px;
+        }
+
+        .container{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            margin-bottom:20px;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        table th,
+        table td{
+            border:1px solid #ddd;
+            padding:10px;
+            text-align:left;
+        }
+
+        table th{
+            background:#0d6efd;
+            color:white;
+        }
+
+        .success{
+            color:green;
+            font-weight:bold;
+        }
+
+        .failed{
+            color:red;
+            font-weight:bold;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Upload History</h1>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>User</th>
+                <th>Module</th>
+                <th>File Name</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Error</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for upload in uploads %}
+
+            <tr>
+
+                <td>{{ upload.user.username }}</td>
+
+                <td>{{ upload.module }}</td>
+
+                <td>{{ upload.file_name }}</td>
+
+                <td>{{ upload.upload_date }}</td>
+
+                <td>
+
+                    {% if upload.status == "SUCCESS" %}
+                        <span class="success">
+                            SUCCESS
+                        </span>
+                    {% else %}
+                        <span class="failed">
+                            FAILED
+                        </span>
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ upload.error_message }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

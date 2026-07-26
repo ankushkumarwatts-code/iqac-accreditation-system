@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Intelligence Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .rank1 { background-color: #ffd700; }
+        .rank2 { background-color: #c0c0c0; }
+        .rank3 { background-color: #cd7f32; }
+    </style>
+</head>
+<body>
+
+<h1>Faculty Intelligence Dashboard</h1>
+
+<table>
+    <tr>
+        <th>Rank</th>
+        <th>Faculty Name</th>
+        <th>Department</th>
+        <th>Total Score</th>
+        <th>Academic</th>
+        <th>Research</th>
+        <th>Student Impact</th>
+    </tr>
+
+    {% for f in data %}
+    <tr class="{% if f.rank == 1 %}rank1{% elif f.rank == 2 %}rank2{% elif f.rank == 3 %}rank3{% endif %}">
+        <td>{{ f.rank }}</td>
+        <td>{{ f.faculty_name }}</td>
+        <td>{{ f.department }}</td>
+        <td>{{ f.total_score }}</td>
+        <td>{{ f.academic }}</td>
+        <td>{{ f.research }}</td>
+        <td>{{ f.student_impact }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+</body>
+</html>

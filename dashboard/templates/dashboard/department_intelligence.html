@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Department Academic Intelligence</title>
+</head>
+<body style="font-family: Arial; margin:40px;">
+
+<h1>Department Academic Strength Dashboard</h1>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Department</th>
+    <th>PhD %</th>
+    <th>Avg Experience</th>
+    <th>Research Score</th>
+    <th>Avg CGPA</th>
+    <th>Placement %</th>
+    <th>Strength Index</th>
+</tr>
+
+{% for d in data %}
+<tr>
+    <td>{{ d.name }}</td>
+    <td>{{ d.phd_percent }}%</td>
+    <td>{{ d.avg_experience }}</td>
+    <td>{{ d.research_score }}</td>
+    <td>{{ d.avg_cgpa }}</td>
+    <td>{{ d.placement_percent }}%</td>
+    <td><strong>{{ d.strength_index }}</strong></td>
+</tr>
+{% endfor %}
+
+</table>
+
+</body>
+</html>

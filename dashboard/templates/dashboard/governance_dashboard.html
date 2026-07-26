@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Institution Governance Dashboard</title>
+</head>
+<body style="font-family: Arial; margin:40px;">
+
+<h1>Institution Governance Dashboard</h1>
+
+<p><strong>Role:</strong> {{ role }}</p>
+<p><strong>Year:</strong> {{ year }}</p>
+
+<hr>
+
+<h2>NAAC Score: {{ naac_score }}%</h2>
+<h2>NBA Score: {{ nba_score }}%</h2>
+
+<h2>Institutional Health Index: {{ health_index }}%</h2>
+<h3>Status: {{ health_status }}</h3>
+<h3>Accreditation Risk Level: {{ risk_level }}</h3>
+
+<hr>
+
+{% if weakest %}
+<div style="background-color:#ffe6e6; padding:10px;">
+    <h3 style="color:red;">⚠ Weakest Area Alert</h3>
+    <p>{{ weakest.code }} - {{ weakest.name }} ({{ weakest.percentage }}%)</p>
+</div>
+{% endif %}
+
+<h2>Criteria Breakdown</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Percentage</th>
+        <th>Status</th>
+    </tr>
+    {% for c in criteria_data %}
+    <tr>
+        <td>{{ c.code }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.percentage }}%</td>
+        <td>{{ c.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+<h2>Upload NBA Data</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="file">
+    <button type="submit">Upload</button>
+</form>
+
+<a href="/intelligence/command-center/">⬅ Back</a>

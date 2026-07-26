@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Institutional Brain Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+    margin:0;
+    font-family: Arial;
+    background:#f4f6f9;
+}
+
+/* HEADER */
+.header{
+    background:#2c3e50;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:250px;
+    height:100vh;
+    background:#34495e;
+    color:white;
+    position:fixed;
+    padding:20px;
+    overflow-y:auto;
+}
+.sidebar-section{
+    background:#1f2f3d;   
+    padding:12px;
+    margin-bottom:25px;
+    border-radius:10px;
+    border:2px solid #00ffcc; 
+    box-shadow:0 0 10px rgba(0,0,0,0.5);
+}
+
+.sidebar-section h3{
+    margin-top:0;
+    border-bottom:1px solid #777;
+    padding-bottom:5px;
+    color:#00ffcc;        
+    font-weight:bold;
+}
+.sidebar a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    margin:10px 0;
+}
+
+/* MAIN */
+.main{
+    margin-left:270px;
+    padding:20px;
+}
+
+/* CARDS */
+.card{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 0 5px rgba(0,0,0,0.1);
+}
+
+/* TABLE */
+table{
+    border-collapse:collapse;
+    width:100%;
+    margin-top:10px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 0 5px rgba(0,0,0,0.1);
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#2c3e50;
+    color:white;
+}
+
+/* RISK COLORS */
+.high{ background:#ffcccc; color:red; font-weight:bold; }
+.medium{ background:#fff3cd; color:orange; font-weight:bold; }
+.low{ background:#d4edda; color:green; font-weight:bold; }
+
+button{
+    padding:8px 12px;
+    border:none;
+    color:white;
+    cursor:pointer;
+}
+
+.btn-blue{ background:#3498db; }
+.btn-green{ background:#27ae60; }
+.btn-red{ background:red; }
+
+</style>
+
+</head>
+
+<body>
+
+<h1 style="background:red;color:white;padding:20px;">
+THIS IS NEW TEMPLATE
+</h1>
+
+<!-- HEADER -->
+<div class="header">
+    <h2>Baba Farid Group of Institutions - Institutional Brain</h2>
+    <button class="btn-red">Logout</button>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h1 style="color:red;">🔥 TEST SIDEBAR 🔥</h1>
+<h1 style="color:yellow;">AK TESTING SUCCESS</h1>
+
+    <!-- ✅ YAHA ADD KIYA -->
+    <h3>Dashboard</h3>
+
+<!-- Institute -->
+<div class="sidebar-section">
+
+    <h3>🏫 Institute Strength</h3>
+
+    <a href="/intelligence/command-center/">
+        Overall Campus Strength
+    </a>
+
+</div>
+
+
+<!-- School Dropdown -->
+<div class="sidebar-section">
+
+    <h3>🏫 School Strength</h3>
+
+    <select onchange="openSchool(this.value)" style="width:100%;padding:8px;">
+
+        <option value="">Select School</option>
+
+        {% for s in all_schools %}
+
+        <option value="{{ s.id }}">
+            {{ s.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <button class="btn-blue" style="width:100%;">
+        📊 Live Analysis
+    </button>
+
+</div>
+
+<!-- DEPARTMENT DROPDOWN -->
+<div class="sidebar-section">
+
+    <h3>🧠 Department Strength</h3>
+
+    <select onchange="openDepartment(this.value)" style="width:100%;padding:8px;">
+
+        <option value="">Select Department</option>
+
+        {% for d in all_departments %}
+
+        <option value="{{ d.id }}">
+            {{ d.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <button class="btn-green" style="width:100%;">
+        📊 Live Analysis
+    </button>
+
+</div>
+
+
+
+<!-- REPORTS DROPDOWN -->
+<div class="sidebar-section">
+
+    <h3>📥 Reports</h3>
+
+    <select onchange="downloadReport(this.value)" style="width:100%;padding:8px;">
+
+        <option value="">Select Report</option>
+
+        <option value="department">
+            Department Report
+        </option>
+
+        <option value="school">
+            School Report
+        </option>
+
+        <option value="institution">
+            Campus Report
+        </option>
+
+    </select>
+
+</div>
+
+<!-- Department Dropdown -->
+<div class="sidebar-section">
+
+    <h3>🧠 Department Strength</h3>
+
+    <select onchange="openDepartment(this.value)" style="width:100%;padding:8px;">
+
+        <option value="">Select Department</option>
+
+        {% for d in all_departments %}
+
+        <option value="{{ d.id }}">
+            {{ d.name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <button class="btn-green" style="width:100%;">
+        📊 Live Analysis
+    </button>
+
+</div>
+
+
+<!-- Reports Dropdown -->
+<div class="sidebar-section">
+
+    <h3>📥 Reports</h3>
+
+    <select onchange="downloadReport(this.value)" style="width:100%;padding:8px;">
+
+        <option value="">Select Report</option>
+
+        <option value="department">
+            Department Report
+        </option>
+
+        <option value="school">
+            School Report
+        </option>
+
+        <option value="institution">
+            Campus Report
+        </option>
+
+    </select>
+
+</div>
+
+    <!-- EXISTING CODE (AS IT IS) -->
+    <div class="sidebar-section">
+    <h3>📑 NAAC Panel</h3>
+
+    <p style="color:yellow;">Metrics: {{ metrics|length }}</p>
+    <!-- ✅ YAHA ADD KARO -->
+    <p style="color:red;">NBA Count: {{ nba_criteria|length }}</p>
+
+    {% for m in metrics %}
+    <div style="margin-bottom:15px; border-bottom:1px solid #555; padding-bottom:10px;">
+
+        <b>{{ m.metric_code }}</b>
+
+        <button class="btn-blue" onclick="downloadTemplate('{{ m.id }}')">
+            Download
+        </button>
+
+        <button class="btn-green" onclick="uploadMetric('{{ m.id }}')">
+            Upload
+        </button>
+
+    </div>
+
+    {% endfor %}
+</div>
+
+
+<div class="sidebar-section">
+
+<h3>📊 NAAC Excel Panel</h3>
+
+<div style="margin-bottom:15px; border-bottom:1px solid #555; padding-bottom:10px;">
+
+    <a href="/intelligence/download-naac-template/">
+        <button class="btn-blue" style="width:100%; margin-bottom:8px;">
+            Download Excel Template
+        </button>
+    </a>
+
+    <form action="/intelligence/upload-naac/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="file" required style="width:100%; margin-bottom:8px;">
+        <button class="btn-green" style="width:100%;">
+            Upload Excel
+        </button>
+    </form>
+
+</div>
+
+</div>   
+
+
+<div class="sidebar-section">
+
+<h3>🏀 NBA Panel</h3>
+
+{% for c in nba_criteria %}
+    <h4>{{ c.name }}</h4>
+
+    {% for m in c.metrics.all %}
+    <div style="margin-bottom:15px; border-bottom:1px solid #555; padding-bottom:10px;">
+
+        <b>{{ m.title }}</b>
+
+        {% if m.template %}
+        <a href="{{ m.template.url }}">
+            <button style="background:blue;color:white;padding:5px;">Download</button>
+        </a>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" action="/nba/upload-nba/">
+            {% csrf_token %}
+            <input type="file" name="file">
+            <input type="hidden" name="metric_id" value="{{ m.id }}">
+            <button style="background:green;color:white;padding:5px;">Upload</button>
+        </form>
+
+    </div>
+    {% endfor %}
+
+{% endfor %}
+
+</div>
+
+
+<!-- MAIN -->
+<div class="main">
+    <p style="color:red;">School Blocks Count: {{ school_blocks|length }}</p>
+    <h2>🏫 School-wise NAAC Analysis</h2>
+
+    
+
+    {% if school_blocks %}
+
+     {% for s in school_blocks %}
+
+     <div class="card">
+
+        <h3>{{ s.school_name }}</h3>
+        <p><b>School Score:</b> {{ s.school_score }}</p>
+
+        <h4>Departments</h4>
+        <ul>
+            {% for d in s.departments %}
+            <li>{{ d.department.name }} - {{ d.health_score }}</li>
+            {% endfor %}
+        </ul>
+        <!-- ✅ GRAPH (FIX) -->
+        <canvas id="chart{{ forloop.counter }}"></canvas>
+
+        <script>
+        new Chart(document.getElementById("chart{{ forloop.counter }}"), {
+        type: 'bar',
+        data: {
+        labels: [{% for n in s.dept_names %}"{{ n }}",{% endfor %}],
+        datasets: [{
+        label: 'Score',
+        data: [{% for sc in s.dept_scores %}{{ sc }},{% endfor %}],
+        backgroundColor: 'blue'
+        }]
+        }
+        });
+        </script>
+
+        <!-- ✅ RISK (FIX) -->
+        <h4>Risk</h4>
+        <ul>
+        {% for d in s.departments %}
+        <li>
+        {{ d.department.name }} →
+        {% if d.health_score < 50 %}
+        <span class="high">HIGH</span>
+        {% elif d.health_score < 75 %}
+        <span class="medium">MEDIUM</span>
+        {% else %}
+        <span class="low">LOW</span>
+        {% endif %}
+        </li>
+        {% endfor %}
+        </ul>
+
+    </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <h3 style="color:red;">❌ NO SCHOOL DATA FOUND</h3>
+
+{% endif %}
+
+
+
+
+
+<!-- ============================= -->
+<!-- 🏫 Institution -->
+<!-- ============================= -->
+
+<div class="card">
+<h3>🏫 Institution Strength</h3>
+
+{% if institution %}
+<p><b>Score:</b> {{ institution.health_score }}</p>
+{% endif %}
+
+<button class="btn-blue">NAAC Report</button>
+<button class="btn-green">Department Report</button>
+
+</div>
+
+<!-- ============================= -->
+<!-- 🧠 Department Analytics -->
+<!-- ============================= -->
+
+<div class="card">
+<h3>🧠 Department Analytics (NAAC vs NBA)</h3>
+
+<table>
+
+<tr>
+<th>Department</th>
+<th>NAAC</th>
+<th>NBA</th>
+<th>Combined</th>
+<th>NAAC Risk</th>
+<th>NBA Risk</th>
+<th>Overall</th>
+</tr>
+
+{% for d in dept_data %}
+
+<tr>
+
+<td>{{ d.name }}</td>
+<td>{{ d.naac }}</td>
+<td>{{ d.nba }}</td>
+<td>{{ d.Strength }}</td>
+
+<td class="
+{% if d.naac_risk == 'HIGH' %}high
+{% elif d.naac_risk == 'MEDIUM' %}medium
+{% else %}low
+{% endif %}
+">
+{{ d.naac_risk }}
+</td>
+
+<td class="
+{% if d.nba_risk == 'HIGH' %}high
+{% elif d.nba_risk == 'MEDIUM' %}medium
+{% else %}low
+{% endif %}
+">
+{{ d.nba_risk }}
+</td>
+
+<td class="
+{% if d.overall == 'HIGH' %}high
+{% elif d.overall == 'MEDIUM' %}medium
+{% else %}low
+{% endif %}
+">
+{{ d.overall }}
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- ============================= -->
+<!-- 📈 GRAPH -->
+<!-- ============================= -->
+
+<div class="card">
+<h3>📈 Department Comparison</h3>
+
+<canvas id="deptChart" height="120"></canvas>
+
+</div>
+
+<script>
+
+let labels = [
+{% for d in dept_data %}
+"{{ d.name }}",
+{% endfor %}
+];
+
+let naacData = [
+{% for d in dept_data %}
+{{ d.naac }},
+{% endfor %}
+];
+
+let nbaData = [
+{% for d in dept_data %}
+{{ d.nba }},
+{% endfor %}
+];
+
+const ctx = document.getElementById('deptChart').getContext('2d');
+
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: labels,
+datasets: [
+{
+label: 'NAAC Score',
+data: naacData,
+backgroundColor: 'blue'
+},
+{
+label: 'NBA Score',
+data: nbaData,
+backgroundColor: 'orange'
+}
+]
+},
+options: {
+responsive: true,
+plugins: {
+legend: {
+position: 'top'
+}
+}
+}
+});
+
+</script>
+
+<!-- ============================= -->
+<!-- 📊 Department Ranking -->
+<!-- ============================= -->
+
+<div class="card">
+<h3>📊 Department Ranking</h3>
+
+<table>
+
+<tr>
+<th>Department</th>
+<th>Strength Score</th>
+<th>Status</th>
+</tr>
+
+{% for d in departments %}
+
+<tr>
+<td>{{ d.department.name }}</td>
+<td>{{ d.health_score }}</td>
+<td>{{ d.status }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- ============================= -->
+<!-- 🏫 School Ranking -->
+<!-- ============================= -->
+
+<div class="card">
+<h3>🏫 School Ranking</h3>
+
+<table>
+
+<tr>
+<th>School</th>
+<th>Strength Score</th>
+</tr>
+
+{% for s in schools %}
+
+<tr>
+<td>{{ s.school.name }}</td>
+<td>{{ s.health_score }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>
